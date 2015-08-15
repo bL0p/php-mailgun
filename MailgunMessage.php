@@ -476,12 +476,12 @@ class MailgunMessage implements MailgunObject
             $data['html'] = $this->_html;
         }
 
-        foreach ($this->_attachments as $number => $attachment) {
-            $data['attachment[' . ($number + 1) . ']'] = new CURLFile($attachment);
-        }
+        $php_version = phpversion();
 
-        foreach ($this->_inline as $number => $attachment) {
-            $data['inline[' . ($number + 1) . ']'] = new CURLFile($attachment);
+        if(version_compare($php_version, "5.5.0") < 0) {
+            $this->_attachOldWay($data);
+        } else {
+            $this->_attachNewWay($data);
         }
 
         foreach ($this->_tags as $number => $tag) {
@@ -543,6 +543,36 @@ class MailgunMessage implements MailgunObject
         }
 
         return $data;
+    }
+
+    /**
+     * Add attachments for PHP versions prior to 5.5.0
+     * @param array
+     */
+    private function _attachOldWay($data)
+    {
+        foreach ($this->_attachments as $number => $attachment) {
+            $data['attachment[' . ($number + 1) . ']'] = '@' . $attachment;
+        }
+
+        foreach ($this->_inline as $number => $attachment) {
+            $data['inline[' . ($number + 1) . ']'] = '@' . $attachment;
+        }
+    }
+
+    /**
+     * Add attachments for PHP versions prior to 5.5.0
+     * @param array
+     */
+    private function _attachNewWay($data)
+    {
+        foreach ($this->_attachments as $number => $attachment) {
+            $data['attachment[' . ($number + 1) . ']'] = new CURLFile($attachment);
+        }
+
+        foreach ($this->_inline as $number => $attachment) {
+            $data['inline[' . ($number + 1) . ']'] = new CURLFile($attachment);
+        }
     }
 
     /**
