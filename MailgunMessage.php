@@ -479,9 +479,9 @@ class MailgunMessage implements MailgunObject
         $php_version = phpversion();
 
         if(version_compare($php_version, "5.5.0") < 0) {
-            $this->_attachOldWay($data);
+            $data = $this->_attachOldWay($data);
         } else {
-            $this->_attachNewWay($data);
+            $data = $this->_attachNewWay($data);
         }
 
         foreach ($this->_tags as $number => $tag) {
@@ -548,6 +548,7 @@ class MailgunMessage implements MailgunObject
     /**
      * Add attachments for PHP versions prior to 5.5.0
      * @param array
+     * @return array updated data
      */
     private function _attachOldWay($data)
     {
@@ -558,11 +559,14 @@ class MailgunMessage implements MailgunObject
         foreach ($this->_inline as $number => $attachment) {
             $data['inline[' . ($number + 1) . ']'] = '@' . $attachment;
         }
+
+        return $data;
     }
 
     /**
-     * Add attachments for PHP versions prior to 5.5.0
+     * Add attachments for PHP versions newer than 5.5.0
      * @param array
+     * @return array updated data
      */
     private function _attachNewWay($data)
     {
@@ -573,6 +577,8 @@ class MailgunMessage implements MailgunObject
         foreach ($this->_inline as $number => $attachment) {
             $data['inline[' . ($number + 1) . ']'] = new CURLFile($attachment);
         }
+
+        return $data;
     }
 
     /**
