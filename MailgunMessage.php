@@ -477,11 +477,11 @@ class MailgunMessage implements MailgunObject
         }
 
         foreach ($this->_attachments as $number => $attachment) {
-            $data['attachment[' . ($number + 1) . ']'] = '@' . $attachment;
+            $data['attachment[' . ($number + 1) . ']'] = new CURLFile($attachment);
         }
 
         foreach ($this->_inline as $number => $attachment) {
-            $data['inline[' . ($number + 1) . ']'] = '@' . $attachment;
+            $data['inline[' . ($number + 1) . ']'] = new CURLFile($attachment);
         }
 
         foreach ($this->_tags as $number => $tag) {
